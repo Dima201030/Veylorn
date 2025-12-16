@@ -5,7 +5,8 @@ project(Veylorn LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(Veylorn main.cpp)
+add_executable(Veylorn main.cpp
+    lvlparser.h lvlparser.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS Veylorn
