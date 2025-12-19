@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Veylorn main.cpp
     lvlparser.h lvlparser.cpp
-    examples/exampleMap.txt)
+    examples/exampleMap.txt
+    map.h map.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS Veylorn
