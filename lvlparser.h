@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
-#include <fstream>
 
-int checkToValidMap(const std::string &path);
+#include "map.h"
+
+ErrorsCodeMap checkToValidMap(const std::string &path);

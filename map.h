@@ -6,21 +6,21 @@
 
 #include <cstddef>
 
-enum class ErrorsCode : int {
+enum class ErrorsCodeMap : int {
     OK = 0,
     NOFILE,
-    BADFORMAT
+    NOAVAILABLE,
+
 };
 
 struct Map {
 
     explicit Map(const char* fileName);
 
-
     bool isLoaded() const;
-    ErrorsCode getLastError() const;
+    ErrorsCodeMap getLastError() const;
 
-    ErrorsCode loadMapFile(const char* fileName);
+    ErrorsCodeMap loadMapFile(const char* fileName);
 
     // Getters
     int getColumns() const;
@@ -40,7 +40,7 @@ private:
     int   _column = 0;
     int   _lines  = 0;
 
-    ErrorsCode _lastError = ErrorsCode::OK;
+    ErrorsCodeMap _lastError = ErrorsCodeMap::OK;
 
     bool isCheckMapLevl();
 

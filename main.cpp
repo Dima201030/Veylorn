@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "lvlparser.h"
+// #include "lvlparser.h"
 #include "map.h"
 
 int main() {
@@ -11,7 +11,7 @@ int main() {
 
     Map levelMap("/Users/dima/Veylorn/examples/exampleMap.txt");
 
-
+    std::cout << int(levelMap.getLastError());
 
     return 0;
 }

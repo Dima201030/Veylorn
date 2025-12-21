@@ -2,13 +2,17 @@
 
 #include <string>
 #include <fstream>
+#include <filesystem>
+
+bool fileExists(const std::string &path) {
+    return std::filesystem::exists(path) && std::filesystem::is_regular_file(path);
+}
 
 int countColumns(const std::string &path) {
-    if (path == "") {
-        return 0;
-    }
-
     std::ifstream file(path);
+    if (!file.is_open()) {
+        return false;
+    }
 
     int count = 0;
 
@@ -22,11 +26,10 @@ int countColumns(const std::string &path) {
 }
 
 bool checkSymbInCol(const std::string &path) {
-    if (path == "") {
-        return 0;
-    }
-
     std::ifstream file(path);
+    if (!file.is_open()) {
+        return false;
+    }
 
     std::string firstLine;
     getline(file, firstLine);
@@ -44,19 +47,91 @@ bool checkSymbInCol(const std::string &path) {
     return 0;
 }
 
-int checkToValidMap(const std::string &path) {
-    if (path == "") {
-        return 1;
+bool hasEnoughFreeCells(const std::string &path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        return false;
     }
 
-    if (countColumns(path) <= 1) {
-        return 2;
+    std::string line;
+
+    std::getline(file, line);
+
+    int indexInFile = 1;
+    int maxIndex = countColumns(path);
+
+    while (std::getline(file, line)) {
+        if (++indexInFile >= maxIndex) {
+            break;
+        }
+
+        int count = 0;
+        for (char ch : line) {
+            if (ch == ' ') ++count;
+        }
+
+        if (count < 1) {
+            return false;
+        }
     }
 
-    if (checkSymbInCol(path)) {
-        return 3;
+    return true;
+}
+
+bool checkFirstAndLastLine(const std::string &path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+        return false;
     }
 
-    return 0;
+    std::string line;
+
+    std::getline(file, line);
+
+    int count = 0;
+
+    for (char ch : line) {
+        if (ch == ' ') ++count;
+        }
+
+    if (count >= 1) {
+        return false;
+    }
+
+    int indexInFile = 1;
+    int maxIndex = countColumns(path);
+
+    while (std::getline(file, line)) {
+        if (++indexInFile >= maxIndex) {
+            break;
+        }
+    }
+
+    count = 0;
+
+    for (char ch : line) {
+        if (ch == ' ') ++count;
+        }
+
+    if (count >= 1) {
+        return false;
+    }
+
+    return true;
+}
+
+ErrorsCodeMap checkToValidMap(const std::string &path) {
+    if (path == "" || !fileExists(path)) {
+        return ErrorsCodeMap::NOFILE;
+    }
+
+    if (countColumns(path) <= 1
+        || checkSymbInCol(path)
+        || !hasEnoughFreeCells(path)
+        || !checkFirstAndLastLine(path)) {
+        return ErrorsCodeMap::NOAVAILABLE;
+    }
+
+    return ErrorsCodeMap::OK;
 }
 

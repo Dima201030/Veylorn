@@ -1,31 +1,38 @@
-// IN TEST
-
 #include "map.h"
 #include <cstddef>
 
-Map::Map(const char* fileName) : _column(0), _lines(0), _lastError(ErrorsCode::OK) {
+#include "lvlparser.h"
 
-    _lastError = loadMapFile(fileName);
+Map::Map(const char* path) : _column(0), _lines(0), _matrix(nullptr), _lastError(ErrorsCodeMap::OK) {
 
-    if (_lastError != ErrorsCode::OK) {
+    _lastError = loadMapFile(path);
+
+    if (_lastError != ErrorsCodeMap::OK) {
         allocateEmptyMatrix();
     }
 }
 
 bool Map::isLoaded() const {
-    if (_lastError == ErrorsCode::OK) {
+    if (_lastError == ErrorsCodeMap::OK) {
         return true;
     } else {
         return false;
     }
 }
 
-ErrorsCode Map::getLastError() const {
+ErrorsCodeMap Map::getLastError() const {
     return _lastError;
 }
 
-ErrorsCode Map::loadMapFile(const char* fileName) {
-    return ErrorsCode::OK;
+ErrorsCodeMap Map::loadMapFile(const char* path) {
+    ErrorsCodeMap checkMap = checkToValidMap(path);
+    if (checkMap != ErrorsCodeMap::OK) {
+        return checkMap;
+    }
+
+    // In dev...
+
+    return ErrorsCodeMap::OK;
 }
 
 void Map::allocateEmptyMatrix() {
