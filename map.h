@@ -1,6 +1,6 @@
 // IN TEST
-// column - vertically
-// lines  - horizontally
+// column - vertically (x axis)
+// lines  - horizontally (y axis)
 
 #pragma once
 
@@ -15,35 +15,37 @@ enum class ErrorsCodeMap : int {
 
 struct Map {
 
-    explicit Map(const char* fileName);
+    explicit Map(const char *fileName);
+    ~Map();
 
     bool isLoaded() const;
     ErrorsCodeMap getLastError() const;
 
-    ErrorsCodeMap loadMapFile(const char* fileName);
+    ErrorsCodeMap loadMapFile(const char *fileName);
 
     // Getters
     int getColumns() const;
     int getLines() const;
 
-    // Access to column
+    // Access to column. First elem - (x axis), second elem - (y axis)
     int operator()(int col, int line);
     const int operator()(int col, int line) const;
 
     // Access to lines
-    int* operator[](int col);
-    const int* operator[](int col) const;
+    int *operator[](int col);
+    const int *operator[](int col) const;
 
 private:
 
-    int** _matrix = nullptr;
+    int **_matrix = nullptr;
     int   _column = 0;
     int   _lines  = 0;
 
     ErrorsCodeMap _lastError = ErrorsCodeMap::OK;
 
-    bool isCheckMapLevl();
-
     void allocateEmptyMatrix();
+
+    void recreateMatrix();
+    void recreateMatrix(int defaultValue);
 
 };

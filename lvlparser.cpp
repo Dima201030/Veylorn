@@ -10,45 +10,26 @@ bool fileExists(const std::string &path) {
 
 int countColumns(const std::string &path) {
     std::ifstream file(path);
+
     if (!file.is_open()) {
         return false;
     }
 
     int count = 0;
-
     std::string line;
 
     while (std::getline(file, line)) {
         ++count;
     }
 
+    file.close();
+
     return count;
 }
 
-bool checkSymbInCol(const std::string &path) {
+int countSymblsInColumn(const std::string &path) {
     std::ifstream file(path);
-    if (!file.is_open()) {
-        return false;
-    }
 
-    std::string firstLine;
-    getline(file, firstLine);
-
-    int count = firstLine.size();
-
-    std::string line;
-
-    while (std::getline(file, line)) {
-        if (line.size() != count) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-bool hasEnoughFreeCells(const std::string &path) {
-    std::ifstream file(path);
     if (!file.is_open()) {
         return false;
     }
@@ -57,8 +38,51 @@ bool hasEnoughFreeCells(const std::string &path) {
 
     std::getline(file, line);
 
-    int indexInFile = 1;
-    int maxIndex = countColumns(path);
+    file.close();
+
+    return line.size();
+}
+
+bool checkSymbInCol(const std::string &path) {
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    std::string firstLine, line;
+
+    getline(file, firstLine);
+
+    int count = firstLine.size();
+
+    while (std::getline(file, line)) {
+        if (line.size() != count) {
+
+            file.close();
+
+            return 1;
+        }
+    }
+
+    file.close();
+
+    return 0;
+}
+
+bool hasEnoughFreeCells(const std::string &path) {
+    std::ifstream file(path);
+
+    if (!file.is_open()) {
+        return false;
+    }
+
+    std::string line;
+
+    std::getline(file, line);
+
+    int indexInFile = 1,
+        maxIndex = countColumns(path);
 
     while (std::getline(file, line)) {
         if (++indexInFile >= maxIndex) {
@@ -71,30 +95,40 @@ bool hasEnoughFreeCells(const std::string &path) {
         }
 
         if (count < 1) {
+
+            file.close();
+
             return false;
         }
     }
+
+    file.close();
 
     return true;
 }
 
 bool checkFirstAndLastLine(const std::string &path) {
     std::ifstream file(path);
+
     if (!file.is_open()) {
         return false;
     }
 
     std::string line;
+    int count = 0;
 
     std::getline(file, line);
 
-    int count = 0;
-
     for (char ch : line) {
-        if (ch == ' ') ++count;
+        if (ch == ' ') {
+            ++count;
         }
+    }
 
     if (count >= 1) {
+
+        file.close();
+
         return false;
     }
 
@@ -110,12 +144,19 @@ bool checkFirstAndLastLine(const std::string &path) {
     count = 0;
 
     for (char ch : line) {
-        if (ch == ' ') ++count;
+        if (ch == ' ') {
+            ++count;
         }
+    }
 
     if (count >= 1) {
+
+        file.close();
+
         return false;
     }
+
+    file.close();
 
     return true;
 }
