@@ -11,6 +11,7 @@ int main() {
         for (size_t j = 0; j < levelMap.getLines(); ++j) {
             std::cout << char(levelMap(i, j)) << ' ';
         }
+
         std::cout << '\n';
     }
 
