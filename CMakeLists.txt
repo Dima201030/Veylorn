@@ -2,16 +2,27 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Veylorn LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_executable(Veylorn
+    main.cpp
+    lvlparser.cpp
+    map.cpp
+)
 
-add_executable(Veylorn main.cpp
-    lvlparser.h lvlparser.cpp
-    examples/exampleMap.txt
-    map.h map.cpp)
+target_compile_features(Veylorn PRIVATE cxx_std_17)
+
+if (MSVC)
+    target_compile_options(Veylorn PRIVATE /W4)
+else()
+    target_compile_options(Veylorn PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/examples/exampleMap.txt
+    ${CMAKE_BINARY_DIR}/exampleMap.txt
+    COPYONLY
+)
 
 include(GNUInstallDirs)
 install(TARGETS Veylorn
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
