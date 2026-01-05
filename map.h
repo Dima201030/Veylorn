@@ -4,64 +4,62 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
-// Enum representing possible error codes for map operations
+#include "player.h"
+
 enum class ErrorsCodeMap : int {
-    OK = 0,         // No errors
-    NOFILE,         // File not found
-    NOAVAILABLE,    // Map is invalid or unavailable
+    OK = 0,
+    NOFILE,
+    NOAVAILABLE,
 
 };
 
-// Structure representing a 2D map with dynamic allocation
 struct Map {
 
-    // Constructor: loads the map from the given file name
-    explicit Map(const char *fileName);
+    explicit Map(std::string path);
 
-    // Destructor: frees allocated memory
     ~Map();
 
-    // Checks if the map is successfully loaded
     bool isLoaded() const;
 
-    // Returns the last error code
     ErrorsCodeMap getLastError() const;
 
-    // Loads the map from a file and validates it
-    ErrorsCodeMap loadMapFile(const char *fileName);
+    ErrorsCodeMap loadMapFile(std::string fileName);
 
-    // Getters
-    // Get the number of columns (vertical size)
-    int getColumns() const;
+    size_t getColumns() const;
 
-    // Get the number of lines (horizontal size)
-    int getLines() const;
+    size_t getLines() const;
 
-    // Access a specific cell: first argument is column (x), second is line (y)
-    int operator()(int col, int line);
-    const int operator()(int col, int line) const;
+    void movePlayer(int posX, int posY);
 
-    // Access a full column
-    int *operator[](int col);
-    const int *operator[](int col) const;
+    int operator()(size_t col, size_t line);
+    int operator()(size_t col, size_t line) const;
+
+    int *operator[](size_t col);
+    const int *operator[](size_t col) const;
+
+    std::string _serviceLine;
+    std::string _errorFlag = "·";
+
+    Player _player;
 
 private:
 
-    int **_matrix = nullptr;    // 2D array storing map values
-    int   _column = 0;          // Number of columns
-    int   _lines  = 0;          // Number of lines
+    int       **_matrix  = nullptr;
+    size_t      _column  = 0;
+    size_t      _lines   = 0;
 
-    // Last error state
     ErrorsCodeMap _lastError = ErrorsCodeMap::OK;
 
-    // Allocates an empty matrix with current size
     void allocateEmptyMatrix();
 
-    // Recreates the matrix without default values
     void recreateMatrix();
 
-    // Recreates the matrix and fills with defaultValue
     void recreateMatrix(int defaultValue);
+
+    void setPlayer();
+
+    void clearPlayer();
 
 };
