@@ -1,7 +1,7 @@
-#include <iostream>
 #include <cstddef>
 #include <termios.h>
 #include <unistd.h>
+#include <iostream>
 
 #include "map.h"
 
