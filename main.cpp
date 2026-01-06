@@ -24,12 +24,15 @@ char getch()
 
 int main(int argc, char** argv) {
     system("clear");
-    std::string mapName = "/Users/dima/Veylorn/map3.txt";
+
+    std::string mapName = "/Users/dima/Veylorn/map1.txt";
     if (argc == 2) {
         mapName = argv[1];
         std::cout << argv[1];
     }
-    std::cout << "\033[?25l";
+
+    std::cout << "\033[?25h";
+
     Map levelMap(mapName);
 
     if (!levelMap.isLoaded()) {
