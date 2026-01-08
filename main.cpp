@@ -24,7 +24,7 @@ char getch()
 
 int main(int argc, char** argv) {
     system("clear");
-    std::string mapName = "/Users/dima/Veylorn/map3.txt";
+    std::string mapName = "/Users/dima/Veylorn/map1.txt";
     if (argc == 2) {
         mapName = argv[1];
         std::cout << argv[1];
@@ -49,14 +49,34 @@ int main(int argc, char** argv) {
 
         char key = getch();
 
-        if (key == 'w') {
+        switch (key) {
+        case 'w':
             levelMap.movePlayer(0, -1);
-        } else if (key == 's') {
+            break;
+        case 'W':
+            levelMap.movePlayer(0, -2, true);
+            break;
+        case 's':
             levelMap.movePlayer(0, 1);
-        } else if (key == 'd') {
+            break;
+        case 'S':
+            levelMap.movePlayer(0, 2, true);
+            break;
+        case 'd':
             levelMap.movePlayer(1, 0);
-        } else if (key == 'a') {
+            break;
+        case 'D':
+            levelMap.movePlayer(2, 0, true);
+            break;
+        case 'a':
             levelMap.movePlayer(-1, 0);
+            break;
+        case 'A':
+            levelMap.movePlayer(-2, 0, true);
+            break;
+
+        default:
+            break;
         }
 
         std::cout << std::flush;

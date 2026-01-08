@@ -1,4 +1,4 @@
-#pragma once
+#include <cstddef>
 
 struct Player {
     int  posX = 0;

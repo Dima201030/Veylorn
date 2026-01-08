@@ -5,7 +5,7 @@
 #include "map.h"
 #include "lvlparser.h"
 
-void parsePlayerFromServiceLine(const std::string& line, Player& player) {
+void parsePlayerFromServiceLine(const std::string &line, Player &player) {
     std::string key;
     std::string value;
 
@@ -64,6 +64,7 @@ Map::Map(std::string path) : _matrix(nullptr), _column(0), _lines(0),  _lastErro
     } else {
         _serviceLine = getServiceLine(path);
         parsePlayerFromServiceLine(_serviceLine, _player);
+        parseObjects();
         setPlayer();
     }
 }
@@ -73,6 +74,21 @@ Map::~Map() {
         delete[] _matrix[i];
     }
     delete[] _matrix;
+}
+
+void Map::parseObjects()
+{
+    // for (size_t y = 0; y < _column; ++y) {
+    //     for (size_t x = 0; x < _lines; ++x) {
+    //         switch (_matrix[x][y]) {
+    //         case CellType::
+
+    //             break;
+    //         default:
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
 bool Map::isLoaded() const {
@@ -102,14 +118,30 @@ ErrorsCodeMap Map::loadMapFile(std::string path) {
     _column = countColumns(path) - 1;
     _lines  = countSymblsInColumn(path);
 
-    recreateMatrix();
+    reCreateMatrix();
 
     std::string line;
 
     for (size_t y = 0; y < _column; ++y) {
         std::getline(file, line);
         for (size_t x = 0; x < _lines; ++x) {
-            _matrix[x][y] = line[x];
+            switch (char(line[x])) {
+            case ' ':
+                _matrix[x][y] = CELL_EMPTY;
+                break;
+            case '#':
+                _matrix[x][y] = CELL_WALL;
+                break;
+            case '@':
+                _matrix[x][y] = CELL_PLAYER;
+                break;
+            case '.':
+                _matrix[x][y] = CELL_PLAYER_TRACE;
+                break;
+            default:
+                _matrix[x][y] = CELL_UNKNOWN;
+                break;
+            }
         }
     }
 
@@ -120,38 +152,38 @@ void Map::allocateEmptyMatrix() {
     _column = 1;
     _lines  = 1;
 
-    _matrix = new int*[_lines];
-    _matrix[0] = new int[_column]{0};
+    _matrix = new CellType*[_lines];
+    _matrix[0] = new CellType[_column]{CellType::CELL_EMPTY};
 }
 
-void Map::recreateMatrix() {
+void Map::reCreateMatrix() {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
             delete[] _matrix[i];
         }
         delete[] _matrix;
     }
-    _matrix = new int*[_lines];
+    _matrix = new CellType*[_lines];
 
     for (size_t y = 0; y < _lines; ++y) {
-        _matrix[y] = new int[_column];
+        _matrix[y] = new CellType[_column];
         for (size_t x = 0; x < _column; ++x) {
-            _matrix[y][x] = 0;
+            _matrix[y][x] = CellType::CELL_EMPTY;
         }
     }
 }
 
-void Map::recreateMatrix(int defaultValue) {
+void Map::reCreateMatrix(CellType defaultValue) {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
             delete[] _matrix[i];
         }
         delete[] _matrix;
     }
-    _matrix = new int*[_lines];
+    _matrix = new CellType*[_lines];
 
     for (size_t y = 0; y < _lines; ++y) {
-        _matrix[y] = new int[_column];
+        _matrix[y] = new CellType[_column];
         for (size_t x = 0; x < _column; ++x) {
             _matrix[y][x] = defaultValue;
         }
@@ -166,38 +198,113 @@ int Map::operator()(size_t column, size_t lines) const {
     return _matrix[lines][column];
 }
 
-int* Map::operator[](size_t col) {
+CellType *Map::operator[](size_t col) {
     return _matrix[col];
 }
 
-void Map::movePlayer(int posX, int posY)
-{
-    if (_matrix[_player.posX + posX][_player.posY + posY] != '#') {
-        _errorFlag = "·";
-        if (_matrix[_player.posX + posX][_player.posY + posY] == 'E') {
-            _errorFlag = "✅";
-        }
-        clearPlayer();
-        _player.posX += posX;
-        _player.posY += posY;
-        setPlayer();
-    } else {
+void Map::movePlayer(int posX, int posY, bool isRun) {
+    if ((_player.posX + posX <= 0 && (posX != 1 && posX != -1))|| _player.posX + posX >= static_cast<int>(_lines)) {
         _errorFlag = "🛑";
+        return;
+    }
+    if ((_player.posY + posY <= 0 && (posY != 1 && posY != -1))|| _player.posY + posY >= static_cast<int>(_column)) {
+        _errorFlag = "🛑";
+        return;
     }
 
+    if (isRun) {
+        if (posX == 2) {
+            if (_matrix[_player.posX + 2][_player.posY] != '#') {
+                if (_matrix[_player.posX + 1][_player.posY] != '#') {
+                    _errorFlag = "·";
+                    // if (_matrix[_player.posX + 2][_player.posY] == 'E') {
+                    //     _errorFlag = "✅";
+                    // }
+                    _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    _player.posX += 2;
+                    _matrix[_player.posX - 1][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    setPlayer();
+                } else {
+                    _errorFlag = "🛑";
+                }
+            } else  {
+                movePlayer(posX - 1, posY, false);
+            }
+        } else if (posX == -2) {
+            if (_matrix[_player.posX - 2][_player.posY] != '#') {
+                if (_matrix[_player.posX - 1][_player.posY] != '#') {
+                    _errorFlag = "·";
+                    // if (_matrix[_player.posX + 2][_player.posY] == 'E') {
+                    //     _errorFlag = "✅";
+                    // }
+                    _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    _player.posX -= 2;
+                    _matrix[_player.posX + 1][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    setPlayer();
+                } else {
+                    _errorFlag = "🛑";
+                }
+            } else  {
+                movePlayer(posX + 1, posY, false);
+            }
+        }
+        if (posY == 2) {
+            if (_matrix[_player.posX][_player.posY + 2] != '#') {
+                if (_matrix[_player.posX][_player.posY + 1] != '#') {
+                    _errorFlag = "·";
+                    // if (_matrix[_player.posX + 2][_player.posY] == 'E') {
+                    //     _errorFlag = "✅";
+                    // }
+                    _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    _player.posY += 2;
+                    _matrix[_player.posX][_player.posY - 1] = CellType::CELL_PLAYER_TRACE;
+                    setPlayer();
+                } else {
+                    _errorFlag = "🛑";
+                }
+            } else  {
+                movePlayer(posX, posY - 1, false);
+            }
+        } else if (posY == -2) {
+            if (_matrix[_player.posX][_player.posY - 2] != '#') {
+                if (_matrix[_player.posX][_player.posY - 1] != '#') {
+                    _errorFlag = "·";
+                    // if (_matrix[_player.posX + 2][_player.posY] == 'E') {
+                    //     _errorFlag = "✅";
+                    // }
+                    _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER_TRACE;
+                    _player.posY -= 2;
+                    _matrix[_player.posX][_player.posY + 1] = CellType::CELL_PLAYER_TRACE;
+                    setPlayer();
+                } else {
+                    _errorFlag = "🛑";
+                }
+            } else  {
+                movePlayer(posX, posY + 1, false);
+            }
+        }
+    } else {
+        if (_matrix[_player.posX + posX][_player.posY + posY] != '#') {
+            _errorFlag = "·";
+            // if (_matrix[_player.posX + posX][_player.posY + posY] == 'E') {
+            //     _errorFlag = "✅";
+            // }
+            _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER_TRACE;
+            _player.posX += posX;
+            _player.posY += posY;
+            setPlayer();
+        } else {
+            _errorFlag = "🛑";
+        }
+    }
 }
 
 void Map::setPlayer()
 {
-    _matrix[_player.posX][_player.posY] = _player.ch;
+    _matrix[_player.posX][_player.posY] = CellType::CELL_PLAYER;
 }
 
-void Map::clearPlayer()
-{
-    _matrix[_player.posX][_player.posY] = '.';
-}
-
-const int* Map::operator[](size_t col) const {
+const CellType *Map::operator[](size_t col) const {
     return _matrix[col];
 }
 

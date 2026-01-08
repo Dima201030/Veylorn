@@ -5,8 +5,10 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 
 #include "player.h"
+#include "object.h"
 
 enum class ErrorsCodeMap : int {
     OK = 0,
@@ -15,11 +17,21 @@ enum class ErrorsCodeMap : int {
 
 };
 
+enum CellType {
+    CELL_EMPTY = 32,
+    CELL_WALL  = 35,
+    CELL_PLAYER = 64,
+    CELL_PLAYER_TRACE = 46,
+    CELL_UNKNOWN = -1
+};
+
 struct Map {
 
     explicit Map(std::string path);
 
     ~Map();
+
+    void parseObjects();
 
     bool isLoaded() const;
 
@@ -31,22 +43,23 @@ struct Map {
 
     size_t getLines() const;
 
-    void movePlayer(int posX, int posY);
+    void movePlayer(int x, int y, bool isRun = false);
 
     int operator()(size_t col, size_t line);
     int operator()(size_t col, size_t line) const;
 
-    int *operator[](size_t col);
-    const int *operator[](size_t col) const;
+    CellType *operator[](size_t col);
+    const CellType *operator[](size_t col) const;
 
     std::string _serviceLine;
     std::string _errorFlag = "·";
 
     Player _player;
+    std::vector<ObjectType> objects;
 
 private:
 
-    int       **_matrix  = nullptr;
+    CellType       **_matrix  = nullptr;
     size_t      _column  = 0;
     size_t      _lines   = 0;
 
@@ -54,12 +67,12 @@ private:
 
     void allocateEmptyMatrix();
 
-    void recreateMatrix();
+    void reCreateMatrix();
 
-    void recreateMatrix(int defaultValue);
+    void reCreateMatrix(CellType defaultValue);
 
     void setPlayer();
 
-    void clearPlayer();
+    bool tryMove(int x, int y);
 
 };

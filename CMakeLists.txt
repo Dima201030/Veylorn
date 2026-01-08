@@ -12,6 +12,7 @@ add_executable(Veylorn
     map.h
     lvlparser.h
     player.h
+    object.h
 )
 
 target_include_directories(Veylorn PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
