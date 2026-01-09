@@ -7,8 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "player.h"
-#include "object.h"
+// Forward declaration
+struct Object;
+class Player;
 
 enum class ErrorsCodeMap : int {
     OK = 0,
@@ -17,12 +18,13 @@ enum class ErrorsCodeMap : int {
 
 };
 
-enum CellType {
-    CELL_EMPTY = 32,
-    CELL_WALL  = 35,
-    CELL_PLAYER = 64,
-    CELL_PLAYER_TRACE = 46,
-    CELL_UNKNOWN = -1
+enum class CellType {
+    EMPTY,
+    WALL,
+    PLAYER,
+    TRACE,
+    CHEST,
+    GOLD
 };
 
 struct Map {
@@ -31,7 +33,7 @@ struct Map {
 
     ~Map();
 
-    void parseObjects();
+    void parseObjects(std::string path);
 
     bool isLoaded() const;
 
@@ -43,10 +45,13 @@ struct Map {
 
     size_t getLines() const;
 
-    void movePlayer(int x, int y, bool isRun = false);
+    // Player
+    Player *_player;
 
-    int operator()(size_t col, size_t line);
-    int operator()(size_t col, size_t line) const;
+    void setPlayer();
+
+    CellType operator()(size_t col, size_t line);
+    CellType operator()(size_t col, size_t line) const;
 
     CellType *operator[](size_t col);
     const CellType *operator[](size_t col) const;
@@ -54,8 +59,7 @@ struct Map {
     std::string _serviceLine;
     std::string _errorFlag = "·";
 
-    Player _player;
-    std::vector<ObjectType> objects;
+    std::vector<Object> _objects;
 
 private:
 
@@ -70,9 +74,5 @@ private:
     void reCreateMatrix();
 
     void reCreateMatrix(CellType defaultValue);
-
-    void setPlayer();
-
-    bool tryMove(int x, int y);
 
 };
