@@ -1,11 +1,9 @@
 #include "game.h"
 
-#include <iostream>
 
 #include "objects/player.h"
 #include "world/map.h"
 #include "objects/inventory.h"
-#include "objects/object.h"
 #include <objects/item.h>
 #include "utils/conversion.h"
 
@@ -30,6 +28,19 @@ void Game::movePlayer(int dx, int dy, bool isRun) {
 
     size_t x = toST(_player->_posX + dx);
     size_t y = toST(_player->_posY + dy);
+
+    if (isRun) {
+        if (dx != 0) {
+            if (_currentMap->getCell(x - 1, y) == CellType::GOLD) {
+                _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+            }
+
+        } else {
+            if (_currentMap->getCell(x, y - 1) == CellType::GOLD) {
+                _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+            }
+        }
+    }
 
     if (_currentMap->getCell(x, y) == CellType::GOLD) {
         _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);

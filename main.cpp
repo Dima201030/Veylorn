@@ -14,7 +14,7 @@
 
 int main() {
 
-    Game game("", true);
+    Game game("your path", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
@@ -62,8 +62,6 @@ int main() {
             }
             continue;
         }
-
-
 
         std::cout << "\033[H";
         Render::draw(game);

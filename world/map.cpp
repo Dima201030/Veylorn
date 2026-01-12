@@ -104,7 +104,6 @@ void Map::parseObjects(std::string path)
                 Object item(Item(ItemType::GOLD, 1), x, y);
 
                 _objects.push_back(item);
-                _matrix[y][x] = CellType::GOLD;
                 break;
             }
             default:
@@ -246,6 +245,6 @@ size_t Map::getLines() const{
 }
 
 CellType Map::getCell(size_t x, size_t y) const {
-    return _matrix[y][x];
+    return _matrix[x][y];
 }
 
