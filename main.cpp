@@ -1,67 +1,108 @@
+#include <iostream>
 #include <cstddef>
 #include <termios.h>
 #include <unistd.h>
-#include <iostream>
 
-#include "map.h"
+#include "world/map.h"
+#include "game.h"
+#include "ui/render.h"
+#include "utils/conversion.h"
+#include "ui/hud.h"
+#include "objects/player.h"
+#include "ui/renderinventory.h"
 
-char getch()
-{
-    termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);
+int main() {
 
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
+    Game game("your path", true);
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    char ch = static_cast<char>(getchar());
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return ch;
-}
-
-
-int main(int argc, char** argv) {
-    system("clear");
-
-    std::string mapName = "/Users/dima/Veylorn/map1.txt";
-    if (argc == 2) {
-        mapName = argv[1];
-        std::cout << argv[1];
+    if (!game._currentMap->isLoaded()) {
+        game._isRunning = false;
+        return toInt(game._currentMap->getLastError());
     }
 
-    std::cout << "\033[?25h";
+    HUD::renderHealth(game._currentMap->_player);
 
-    Map levelMap(mapName);
+    std::cout << "hh";
+    std::cout << "\033[?25l";
 
-    if (!levelMap.isLoaded()) {
-        return 1;
-    }
-    while (true) {
+    if (game._isRunning) {
         std::cout << "\033[H";
+        Render::draw(game);
+        HUD::renderHealth(game._currentMap->_player);
+    }
 
-        for (size_t i = 0; i < levelMap.getColumns(); ++i) {
-            for (size_t j = 0; j < levelMap.getLines(); ++j) {
-                std::cout << char(levelMap(i, j)) << ' ';
+    while (game._isRunning) {
+
+        if (game._isInInventory) {
+            Render::clearScreen();
+            Render::setCursorPosition(0,0);
+            std::cout << "\033[H";
+            RenderInventory::render(game._inventory);
+
+            char key = getch();
+
+            switch (key){
+            case 'q':
+                game._isRunning = false;
+                break;
+            case 'i':
+                game._isInInventory = false;
+                continue;
             }
-            std::cout << '\n';
+            continue;
         }
-        std::cout << levelMap._errorFlag << std::endl;
 
+
+
+        std::cout << "\033[H";
+        Render::draw(game);
 
         char key = getch();
 
-        if (key == 'w') {
-            levelMap.movePlayer(0, -1);
-        } else if (key == 's') {
-            levelMap.movePlayer(0, 1);
-        } else if (key == 'd') {
-            levelMap.movePlayer(1, 0);
-        } else if (key == 'a') {
-            levelMap.movePlayer(-1, 0);
+        if (game._currentMap->_player->_health <= 0) {
+            game._isRunning = false;
+            break;
         }
 
-        std::cout << std::flush;
+        switch (key) {
+        case 'q':
+            game._isRunning = false;
+            break;
+        case 'w':
+            game.movePlayer(0, -1);
+            break;
+        case 'W':
+            game.movePlayer(0, -2, true);
+            break;
+        case 's':
+            game.movePlayer(0, 1);
+            break;
+        case 'S':
+            game.movePlayer(0, 2, true);
+            break;
+        case 'd':
+            game.movePlayer(1, 0);
+            break;
+        case 'D':
+            game.movePlayer(2, 0, true);
+            break;
+        case 'a':
+            game.movePlayer(-1, 0);
+            break;
+        case 'A':
+            game.movePlayer(-2, 0, true);
+            break;
+        case 'i':
+            game._isInInventory = true;
+            break;
+        }
+
+        HUD::renderHealth(game._currentMap->_player);
     }
+
+    Render::clearScreen();
+    Render::setCursorPosition(0,0);
+    std::cout << "\033[?25h";
+
+    return 0;
 }

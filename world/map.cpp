@@ -1,11 +1,14 @@
 #include <cstddef>
 #include <fstream>
 #include <string>
+#include <iostream>
 
 #include "map.h"
 #include "lvlparser.h"
+#include "../objects/object.h"
+#include "../objects/player.h"
 
-void parsePlayerFromServiceLine(const std::string& line, Player& player) {
+void parsePlayerFromServiceLine(const std::string &line, Player *&player) {
     std::string key;
     std::string value;
 
@@ -22,11 +25,9 @@ void parsePlayerFromServiceLine(const std::string& line, Player& player) {
             }
 
             if (key == "fpx") {
-                player.posX = std::stoi(value);
+                player->_posX = std::stoi(value);
             } else if (key == "fpy") {
-                player.posY = std::stoi(value);
-            } else if (key == "s") {
-                player.ch = value[0];
+                player->_posY = std::stoi(value);
             }
             key.clear();
         }
@@ -55,15 +56,17 @@ std::string getServiceLine(std::string path) {
     return lastNonEmpty;
 }
 
-Map::Map(std::string path) : _matrix(nullptr), _column(0), _lines(0),  _lastError(ErrorsCodeMap::OK) {
+Map::Map(std::string path, Player *player) : _matrix(nullptr), _column(0), _lines(0),  _lastError(ErrorsCodeMap::OK) {
 
     _lastError = loadMapFile(path);
 
     if (_lastError != ErrorsCodeMap::OK) {
         allocateEmptyMatrix();
     } else {
+        _player = player;
         _serviceLine = getServiceLine(path);
         parsePlayerFromServiceLine(_serviceLine, _player);
+        parseObjects(path);
         setPlayer();
     }
 }
@@ -73,6 +76,42 @@ Map::~Map() {
         delete[] _matrix[i];
     }
     delete[] _matrix;
+    delete   _player;
+}
+
+void Map::parseObjects(std::string path)
+{
+    std::fstream file(path, std::ios_base::in);
+
+    if (!file.is_open()) {
+        return;
+    }
+
+    std::string line;
+
+    for (size_t y = 0; y < _column; ++y) {
+        std::getline(file, line);
+        for (size_t x = 0; x < _lines; ++x) {
+            switch (char(line[x])) {
+            // case 'C': { // Пустой сундук
+            //     Object chest(Chest{}, x, y);
+
+            //     _objects.push_back(chest);
+            //     _matrix[x][y] = CellType::CHEST;
+            //     break;
+            // }
+            case 'g': { // Gold
+                Object item(Item(ItemType::GOLD, 1), x, y);
+
+                _objects.push_back(item);
+                _matrix[y][x] = CellType::GOLD;
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    }
 }
 
 bool Map::isLoaded() const {
@@ -102,14 +141,33 @@ ErrorsCodeMap Map::loadMapFile(std::string path) {
     _column = countColumns(path) - 1;
     _lines  = countSymblsInColumn(path);
 
-    recreateMatrix();
+    reCreateMatrix();
 
     std::string line;
 
     for (size_t y = 0; y < _column; ++y) {
         std::getline(file, line);
         for (size_t x = 0; x < _lines; ++x) {
-            _matrix[x][y] = line[x];
+            switch (char(line[x])) {
+            case ' ':
+                _matrix[x][y] = CellType::EMPTY;
+                break;
+            case '#':
+                _matrix[x][y] = CellType::WALL;
+                break;
+            case '@':
+                _matrix[x][y] = CellType::PLAYER;
+                break;
+            case '.':
+                _matrix[x][y] = CellType::TRACE;
+                break;
+            case 'g':
+                _matrix[x][y] = CellType::GOLD;
+                break;
+            default:
+                _matrix[x][y] = CellType::EMPTY;
+                break;
+            }
         }
     }
 
@@ -120,84 +178,62 @@ void Map::allocateEmptyMatrix() {
     _column = 1;
     _lines  = 1;
 
-    _matrix = new int*[_lines];
-    _matrix[0] = new int[_column]{0};
+    _matrix = new CellType*[_lines];
+    _matrix[0] = new CellType[_column]{CellType::EMPTY};
 }
 
-void Map::recreateMatrix() {
+void Map::reCreateMatrix() {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
             delete[] _matrix[i];
         }
         delete[] _matrix;
     }
-    _matrix = new int*[_lines];
+    _matrix = new CellType*[_lines];
 
     for (size_t y = 0; y < _lines; ++y) {
-        _matrix[y] = new int[_column];
+        _matrix[y] = new CellType[_column];
         for (size_t x = 0; x < _column; ++x) {
-            _matrix[y][x] = 0;
+            _matrix[y][x] = CellType::EMPTY;
         }
     }
 }
 
-void Map::recreateMatrix(int defaultValue) {
+void Map::reCreateMatrix(CellType defaultValue) {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
             delete[] _matrix[i];
         }
         delete[] _matrix;
     }
-    _matrix = new int*[_lines];
+    _matrix = new CellType*[_lines];
 
     for (size_t y = 0; y < _lines; ++y) {
-        _matrix[y] = new int[_column];
+        _matrix[y] = new CellType[_column];
         for (size_t x = 0; x < _column; ++x) {
             _matrix[y][x] = defaultValue;
         }
     }
 }
 
-int Map::operator()(size_t column, size_t lines) {
+CellType Map::operator()(size_t column, size_t lines) {
     return _matrix[lines][column];
 }
 
-int Map::operator()(size_t column, size_t lines) const {
+CellType Map::operator()(size_t column, size_t lines) const {
     return _matrix[lines][column];
 }
 
-int* Map::operator[](size_t col) {
+CellType *Map::operator[](size_t col) {
     return _matrix[col];
-}
-
-void Map::movePlayer(int posX, int posY)
-{
-    if (_matrix[_player.posX + posX][_player.posY + posY] != '#') {
-        _errorFlag = "·";
-        if (_matrix[_player.posX + posX][_player.posY + posY] == 'E') {
-            _errorFlag = "✅";
-        }
-        clearPlayer();
-        _player.posX += posX;
-        _player.posY += posY;
-        setPlayer();
-    } else {
-        _errorFlag = "🛑";
-    }
-
 }
 
 void Map::setPlayer()
 {
-    _matrix[_player.posX][_player.posY] = _player.ch;
+    _matrix[_player->_posX][_player->_posY] = CellType::PLAYER;
 }
 
-void Map::clearPlayer()
-{
-    _matrix[_player.posX][_player.posY] = '.';
-}
-
-const int* Map::operator[](size_t col) const {
+CellType *Map::operator[](size_t col) const {
     return _matrix[col];
 }
 
@@ -208,3 +244,8 @@ size_t Map::getColumns() const{
 size_t Map::getLines() const{
     return _lines;
 }
+
+CellType Map::getCell(size_t x, size_t y) const {
+    return _matrix[y][x];
+}
+
