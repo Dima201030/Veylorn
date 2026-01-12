@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
 enum class ItemType : int{
     NONE = 0,
@@ -14,5 +15,7 @@ struct Item {
     ItemType _type = ItemType::NONE;
 
     size_t _amount = 1;
+
+    const std::string name = "Gold";
 };
 

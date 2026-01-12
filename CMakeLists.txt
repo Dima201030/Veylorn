@@ -33,6 +33,9 @@ add_executable(Veylorn
     maps/map2.txt
     maps/map3.txt
     utils/conversion.h utils/conversion.cpp
+    ui/hud.h ui/hud.cpp
+    ui/renderinventory.h ui/renderinventory.cpp
+    objects/object.cpp
 
 )
 

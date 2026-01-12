@@ -1,4 +1,6 @@
-// #include "inventory.h"
+#include "inventory.h"
 
-// inventory::inventory() {
-// }
+// #include "object.h"
+#include "player.h"
+
+Inventory::Inventory(Player *player) : _player(player) {}

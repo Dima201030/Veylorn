@@ -1,19 +1,29 @@
 #pragma once
 
-// #include <vector>
+#include <string>
 
 #include "world/map.h"
 
+struct Inventory;
+
 struct Game {
-    Map* _currentMap;
+
+    Game(std::string path, bool isRunning);
+
     ~Game();
 
-    bool isRunning;
+    Map       *_currentMap;
 
-    void initNewGame();
-    void loadGame();
-    void saveGame();
-    void changeMap();
+    Player    *_player;
+
+    Inventory *_inventory;
+
+    bool _isRunning = true;
+
+    // void initNewGame();
+    // void loadGame();
+    // void saveGame();
+    // void changeMap();
 
     void movePlayer(int dx, int dy, bool isRun = false);
 };

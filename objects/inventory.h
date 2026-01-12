@@ -1,9 +1,16 @@
-// #ifndef INVENTORY_H
-// #define INVENTORY_H
+#pragma once
 
-// class inventory {
-// public:
-//     inventory();
-// };
+#include <vector>
 
-// #endif // INVENTORY_H
+#include "object.h"
+
+struct Player;
+
+struct Inventory {
+
+    Inventory(Player *player);
+
+    Player *_player;
+
+    std::vector<Object> _items;
+};

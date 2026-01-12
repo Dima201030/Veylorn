@@ -8,8 +8,6 @@
 #include "../objects/object.h"
 #include "../objects/player.h"
 
-
-
 void parsePlayerFromServiceLine(const std::string &line, Player *&player) {
     std::string key;
     std::string value;
@@ -58,14 +56,14 @@ std::string getServiceLine(std::string path) {
     return lastNonEmpty;
 }
 
-Map::Map(std::string path) : _matrix(nullptr), _column(0), _lines(0),  _lastError(ErrorsCodeMap::OK) {
+Map::Map(std::string path, Player *player) : _matrix(nullptr), _column(0), _lines(0),  _lastError(ErrorsCodeMap::OK) {
 
     _lastError = loadMapFile(path);
 
     if (_lastError != ErrorsCodeMap::OK) {
         allocateEmptyMatrix();
     } else {
-        _player = new Player();
+        _player = player;
         _serviceLine = getServiceLine(path);
         parsePlayerFromServiceLine(_serviceLine, _player);
         parseObjects(path);

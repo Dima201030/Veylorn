@@ -7,9 +7,11 @@
 #include <string>
 #include <vector>
 
+// #include "../objects/player.h"
+
 // Forward declaration
 struct Object;
-class Player;
+struct Player;
 
 enum class ErrorsCodeMap : int {
     OK = 0,
@@ -29,7 +31,7 @@ enum class CellType {
 
 struct Map {
 
-    explicit Map(std::string path);
+    explicit Map(std::string path, Player *player);
 
     ~Map();
 
