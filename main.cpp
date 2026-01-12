@@ -10,10 +10,11 @@
 #include "ui/hud.h"
 #include "objects/player.h"
 #include "ui/renderinventory.h"
+#include "objects/inventory.h"
 
 int main() {
 
-    Game game("your path", true);
+    Game game("", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
@@ -21,6 +22,16 @@ int main() {
     }
 
     HUD::renderHealth(game._currentMap->_player);
+
+
+    std::cout << "\nKeys: ";
+    if (game._inventory->_items.size() < 10) {
+        std::cout << "00" << game._inventory->_items.size();
+    } else if (game._inventory->_items.size() < 100) {
+        std::cout << "0" << game._inventory->_items.size();
+    } else {
+        std::cout << game._inventory->_items.size();
+    }
 
     std::cout << "hh";
     std::cout << "\033[?25l";
