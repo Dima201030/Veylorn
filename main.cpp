@@ -52,8 +52,6 @@ int main() {
             continue;
         }
 
-
-
         std::cout << "\033[H";
         Render::draw(game);
 
