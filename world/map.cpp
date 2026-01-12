@@ -104,7 +104,6 @@ void Map::parseObjects(std::string path)
                 Object item(Item(ItemType::GOLD, 1), x, y);
 
                 _objects.push_back(item);
-                _matrix[y][x] = CellType::GOLD;
                 break;
             }
             default:

@@ -13,7 +13,7 @@
 
 int main() {
 
-    Game game("your path", true);
+    Game game("/Users/dima/Veylorn/maps/map3.txt", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
