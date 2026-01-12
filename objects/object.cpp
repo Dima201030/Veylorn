@@ -1,6 +1,5 @@
 #include "object.h"
 
-
 // Object::Object(std::variant<Item, Chest> obj, size_t x, size_t y) : _object(std::move(obj)), _x(x), _y(y) {
 //     std::visit([this](auto& o) {
 //         _name = o.name;

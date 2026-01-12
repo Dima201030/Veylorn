@@ -9,10 +9,11 @@
 #include "utils/conversion.h"
 #include "ui/hud.h"
 #include "objects/player.h"
+#include "ui/renderinventory.h"
 
 int main() {
 
-    Game game("/Users/dima/Veylorn/maps/map3.txt", true);
+    Game game("your path", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
@@ -31,6 +32,28 @@ int main() {
     }
 
     while (game._isRunning) {
+
+        if (game._isInInventory) {
+            Render::clearScreen();
+            Render::setCursorPosition(0,0);
+            std::cout << "\033[H";
+            RenderInventory::render(game._inventory);
+
+            char key = getch();
+
+            switch (key){
+            case 'q':
+                game._isRunning = false;
+                break;
+            case 'i':
+                game._isInInventory = false;
+                continue;
+            }
+            continue;
+        }
+
+
+
         std::cout << "\033[H";
         Render::draw(game);
 
@@ -46,25 +69,32 @@ int main() {
             game._isRunning = false;
             break;
         case 'w':
-            game.movePlayer(0, -1); break;
+            game.movePlayer(0, -1);
+            break;
         case 'W':
-            game.movePlayer(0, -2, true); break;
+            game.movePlayer(0, -2, true);
+            break;
         case 's':
-            game.movePlayer(0, 1); break;
+            game.movePlayer(0, 1);
+            break;
         case 'S':
-            game.movePlayer(0, 2, true); break;
+            game.movePlayer(0, 2, true);
+            break;
         case 'd':
-            game.movePlayer(1, 0); break;
+            game.movePlayer(1, 0);
+            break;
         case 'D':
-            game.movePlayer(2, 0, true); break;
+            game.movePlayer(2, 0, true);
+            break;
         case 'a':
-            game.movePlayer(-1, 0); break;
+            game.movePlayer(-1, 0);
+            break;
         case 'A':
-            game.movePlayer(-2, 0, true); break;
-        case 'l':
-
-            game._currentMap->_player->_health -= 10;
-
+            game.movePlayer(-2, 0, true);
+            break;
+        case 'i':
+            game._isInInventory = true;
+            break;
         }
 
         HUD::renderHealth(game._currentMap->_player);

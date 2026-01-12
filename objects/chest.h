@@ -1,10 +1,10 @@
-#pragma once
+// #pragma once
 
-#include <vector>
+// #include <vector>
 
-#include "item.h"
+// #include "item.h"
 
-struct Chest {
-    std::vector<Item> _items;
-    bool isHidden = false;
-};
+// struct Chest {
+//     std::vector<Item> _items;
+//     bool isHidden = false;
+// };

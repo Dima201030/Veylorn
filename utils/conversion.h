@@ -16,6 +16,5 @@ int         toInt(size_t value);
 size_t      toST (int value   );
 
 // char
-
 char getch();
 

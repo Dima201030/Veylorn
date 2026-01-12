@@ -56,7 +56,9 @@ struct Map {
     CellType operator()(size_t col, size_t line) const;
 
     CellType *operator[](size_t col);
-    const CellType *operator[](size_t col) const;
+    CellType *operator[](size_t col) const;
+
+    CellType getCell(size_t x, size_t y) const;
 
     std::string _serviceLine;
     std::string _errorFlag = "·";

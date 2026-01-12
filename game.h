@@ -18,7 +18,8 @@ struct Game {
 
     Inventory *_inventory;
 
-    bool _isRunning = true;
+    bool _isRunning     = true;
+    bool _isInInventory = false;
 
     // void initNewGame();
     // void loadGame();

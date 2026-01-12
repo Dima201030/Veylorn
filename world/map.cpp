@@ -233,7 +233,7 @@ void Map::setPlayer()
     _matrix[_player->_posX][_player->_posY] = CellType::PLAYER;
 }
 
-const CellType *Map::operator[](size_t col) const {
+CellType *Map::operator[](size_t col) const {
     return _matrix[col];
 }
 
@@ -244,3 +244,8 @@ size_t Map::getColumns() const{
 size_t Map::getLines() const{
     return _lines;
 }
+
+CellType Map::getCell(size_t x, size_t y) const {
+    return _matrix[y][x];
+}
+

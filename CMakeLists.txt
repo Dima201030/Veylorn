@@ -22,7 +22,7 @@ add_executable(Veylorn
     objects/chest.h
     objects/chest.cpp
     objects/item.h
-    objects/item.cpp
+
     objects/inventory.h
     objects/inventory.cpp
 
