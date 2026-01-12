@@ -245,6 +245,6 @@ size_t Map::getLines() const{
 }
 
 CellType Map::getCell(size_t x, size_t y) const {
-    return _matrix[y][x];
+    return _matrix[x][y];
 }
 
