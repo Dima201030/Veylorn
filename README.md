@@ -1,6 +1,6 @@
 # Veylorn
 
-[![License: DCL](https://img.shields.io/badge/License-DCL-blue.svg)](https://github.com/Dima201030/Veylorn/blob/main/LICENSE.md)
+[![License: DCL](https://img.shields.io/badge/License-DCL-blue.svg)](https://github.com/Dima201030/Veylorn?tab=License-1-ov-file)
 
 **Veylorn** — это простой **ASCII roguelike** на C++, где пока что можно **ходить по карте**, исследовать лабиринт и использовать свои карты.  
 Каждая карта — это текстовый файл, который можно загрузить в игру.  
