@@ -32,6 +32,10 @@ Key getKey(char& outChar) {
 
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 
+    if (c == '\n') {
+        return Key::Enter;
+    }
+
     outChar = c;
     return Key::Char;
 }

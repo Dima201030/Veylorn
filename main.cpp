@@ -8,6 +8,7 @@
 #include "objects/inventory.h"
 #include "objects/player.h"
 
+#include "systems/approve.h"
 #include "systems/inpusystem.h"
 
 #include "ui/helptips.h"
@@ -21,7 +22,6 @@
 #include "world/map.h"
 
 int main() {
-
     Game game(basePath() + "auxiliary/maps/map3.txt", true);
 
     if (!game._currentMap->isLoaded()) {
@@ -51,26 +51,9 @@ int main() {
 
             switch (key){
             case 'q':
-                game._isRunning = false;
-                break;
-            case 'i':
-                game._isInInventory = false;
-                continue;
-            }
-            continue;
-        }
-
-        if (game._isInInventory) {
-            Render::clearScreen();
-            Render::setCursorPosition(0,0);
-
-            RenderInventory::render(game._inventory);
-
-            char key = getch();
-
-            switch (key){
-            case 'q':
-                game._isRunning = false;
+                if (approveWindow()) {
+                    game._isRunning = false;
+                }
                 break;
             case 'i':
                 game._isInInventory = false;
@@ -89,7 +72,9 @@ int main() {
 
             switch (key){
             case 'q':
-                game._isRunning = false;
+                if (approveWindow()) {
+                    game._isRunning = false;
+                }
                 break;
             case 'h':
                 game._isInTips = false;
@@ -133,7 +118,9 @@ int main() {
         case Key::Char:
             switch (ch) {
             case 'q':
-                game._isRunning = false;
+                if (approveWindow()) {
+                    game._isRunning = false;
+                }
                 break;
             case 'w':
                 game.movePlayer(0, -1);

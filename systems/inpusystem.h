@@ -8,6 +8,7 @@ enum class Key {
     Right,
     HELP,
     INVENTORY,
+    Enter,
     Char
 };
 

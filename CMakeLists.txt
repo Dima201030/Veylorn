@@ -26,8 +26,10 @@ add_executable(Veylorn
     objects/player.h
     objects/player.cpp
 
+    systems/approve.h
+    systems/approve.cpp
     systems/inpusystem.h
-    systems/inpusystem.cpp
+    systems/inpuSystem.cpp
 
     ui/helptips.h
     ui/helptips.cpp
