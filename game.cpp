@@ -26,6 +26,18 @@ Game::~Game() {
 
 void Game::movePlayer(int dx, int dy, bool isRun) {
 
+    int newX = _player->_posX + dx;
+
+    if (newX <= 0 || newX >= toInt(_currentMap->getLines())) {
+        return;
+    }
+
+    int newY = _player->_posY + dy;
+
+    if (newY <= 0 || newY >= toInt(_currentMap->getColumns())) {
+        return;
+    }
+
     size_t x = toST(_player->_posX + dx);
     size_t y = toST(_player->_posY + dy);
 

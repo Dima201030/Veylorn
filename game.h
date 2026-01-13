@@ -20,6 +20,7 @@ struct Game {
 
     bool _isRunning     = true;
     bool _isInInventory = false;
+    bool _isInTips = false;
 
     // void initNewGame();
     // void loadGame();

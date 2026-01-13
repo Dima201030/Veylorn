@@ -8,24 +8,30 @@
 #include "objects/inventory.h"
 #include "objects/player.h"
 
+#include "systems/inpusystem.h"
+
+#include "ui/helptips.h"
 #include "ui/hud.h"
 #include "ui/render.h"
 #include "ui/renderinventory.h"
 
 #include "utils/conversion.h"
+#include "utils/filesystem.h"
 
 #include "world/map.h"
 
 int main() {
 
-    Game game("/Users/dima/Veylorn/maps/map3.txt", true);
+    Game game(basePath() + "auxiliary/maps/map3.txt", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
         return toInt(game._currentMap->getLastError());
     }
 
-    std::cout << "\033[?25l"; // Hide cursor
+    // std::cout << "\033[?25l"; // Hide cursor
+
+    renderTips();
 
     while (game._isRunning) {
         std::cout << "\033[H";
@@ -54,6 +60,44 @@ int main() {
             continue;
         }
 
+        if (game._isInInventory) {
+            Render::clearScreen();
+            Render::setCursorPosition(0,0);
+
+            RenderInventory::render(game._inventory);
+
+            char key = getch();
+
+            switch (key){
+            case 'q':
+                game._isRunning = false;
+                break;
+            case 'i':
+                game._isInInventory = false;
+                continue;
+            }
+            continue;
+        }
+
+        if (game._isInTips) {
+            Render::clearScreen();
+            Render::setCursorPosition(0,0);
+
+            renderTips();
+
+            char key = getch();
+
+            switch (key){
+            case 'q':
+                game._isRunning = false;
+                break;
+            case 'h':
+                game._isInTips = false;
+                continue;
+            }
+            continue;
+        }
+
         Render::draw(game);
 
         HUD::renderHealth(game._currentMap->_player);
@@ -70,40 +114,64 @@ int main() {
 
         // std::cout << "\nHelp - h";
 
-        char key = getch();
+        char ch = 0;
+        Key key = getKey(ch);
 
         switch (key) {
-        case 'q':
-            game._isRunning = false;
-            break;
-        case 'w':
+        case Key::Up:
             game.movePlayer(0, -1);
             break;
-        case 'W':
-            game.movePlayer(0, -2, true);
-            break;
-        case 's':
+        case Key::Down:
             game.movePlayer(0, 1);
             break;
-        case 'S':
-            game.movePlayer(0, 2, true);
-            break;
-        case 'd':
-            game.movePlayer(1, 0);
-            break;
-        case 'D':
-            game.movePlayer(2, 0, true);
-            break;
-        case 'a':
+        case Key::Left:
             game.movePlayer(-1, 0);
             break;
-        case 'A':
-            game.movePlayer(-2, 0, true);
+        case Key::Right:
+            game.movePlayer(1, 0);
             break;
-        case 'i':
-            game._isInInventory = true;
+        case Key::Char:
+            switch (ch) {
+            case 'q':
+                game._isRunning = false;
+                break;
+            case 'w':
+                game.movePlayer(0, -1);
+                break;
+            case 'W':
+                game.movePlayer(0, -2, true);
+                break;
+            case 's':
+                game.movePlayer(0, 1);
+                break;
+            case 'S':
+                game.movePlayer(0, 2, true);
+                break;
+            case 'd':
+                game.movePlayer(1, 0);
+                break;
+            case 'D':
+                game.movePlayer(2, 0, true);
+                break;
+            case 'a':
+                game.movePlayer(-1, 0);
+                break;
+            case 'A':
+                game.movePlayer(-2, 0, true);
+                break;
+            case 'i':
+                game._isInInventory = true;
+                break;
+            case 'h':
+                game._isInTips = true;
+                break;
+            }
+            break;
+        default:
             break;
         }
+
+
     }
 
     Render::clearScreen();

@@ -26,6 +26,9 @@ add_executable(Veylorn
     objects/player.h
     objects/player.cpp
 
+    systems/inpusystem.h
+    systems/inpusystem.cpp
+
     ui/helptips.h
     ui/helptips.cpp
     ui/hud.h
@@ -37,12 +40,13 @@ add_executable(Veylorn
 
     utils/conversion.h
     utils/conversion.cpp
+    utils/filesystem.h
+    utils/filesystem.cpp
 
     auxiliary/maps/map1.txt
     auxiliary/maps/map2.txt
     auxiliary/maps/map3.txt
     auxiliary/help.txt
-
 
 )
 

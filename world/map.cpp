@@ -76,7 +76,6 @@ Map::~Map() {
         delete[] _matrix[i];
     }
     delete[] _matrix;
-    delete   _player;
 }
 
 void Map::parseObjects(std::string path)
