@@ -3,51 +3,42 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include "world/map.h"
 #include "game.h"
-#include "ui/render.h"
-#include "utils/conversion.h"
-#include "ui/hud.h"
-#include "objects/player.h"
-#include "ui/renderinventory.h"
+
 #include "objects/inventory.h"
+#include "objects/player.h"
+
+#include "ui/hud.h"
+#include "ui/render.h"
+#include "ui/renderinventory.h"
+
+#include "utils/conversion.h"
+
+#include "world/map.h"
 
 int main() {
 
-    Game game("your path", true);
+    Game game("/Users/dima/Veylorn/maps/map3.txt", true);
 
     if (!game._currentMap->isLoaded()) {
         game._isRunning = false;
         return toInt(game._currentMap->getLastError());
     }
 
-    HUD::renderHealth(game._currentMap->_player);
-
-
-    std::cout << "\nKeys: ";
-    if (game._inventory->_items.size() < 10) {
-        std::cout << "00" << game._inventory->_items.size();
-    } else if (game._inventory->_items.size() < 100) {
-        std::cout << "0" << game._inventory->_items.size();
-    } else {
-        std::cout << game._inventory->_items.size();
-    }
-
-    std::cout << "hh";
-    std::cout << "\033[?25l";
-
-    if (game._isRunning) {
-        std::cout << "\033[H";
-        Render::draw(game);
-        HUD::renderHealth(game._currentMap->_player);
-    }
+    std::cout << "\033[?25l"; // Hide cursor
 
     while (game._isRunning) {
+        std::cout << "\033[H";
+
+        if (game._currentMap->_player->_health <= 0) {
+            game._isRunning = false;
+            break;
+        }
 
         if (game._isInInventory) {
             Render::clearScreen();
             Render::setCursorPosition(0,0);
-            std::cout << "\033[H";
+
             RenderInventory::render(game._inventory);
 
             char key = getch();
@@ -63,15 +54,23 @@ int main() {
             continue;
         }
 
-        std::cout << "\033[H";
         Render::draw(game);
 
-        char key = getch();
+        HUD::renderHealth(game._currentMap->_player);
 
-        if (game._currentMap->_player->_health <= 0) {
-            game._isRunning = false;
-            break;
+        std::cout << "\nKeys: ";
+
+        if (game._inventory->_items.size() < 10) {
+            std::cout << "00" << game._inventory->_items.size();
+        } else if (game._inventory->_items.size() < 100) {
+            std::cout << "0" << game._inventory->_items.size();
+        } else {
+            std::cout << game._inventory->_items.size();
         }
+
+        // std::cout << "\nHelp - h";
+
+        char key = getch();
 
         switch (key) {
         case 'q':
@@ -105,13 +104,12 @@ int main() {
             game._isInInventory = true;
             break;
         }
-
-        HUD::renderHealth(game._currentMap->_player);
     }
 
     Render::clearScreen();
     Render::setCursorPosition(0,0);
-    std::cout << "\033[?25h";
+
+    std::cout << "\033[?25h"; // Show cursor
 
     return 0;
 }

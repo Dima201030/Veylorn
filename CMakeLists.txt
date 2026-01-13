@@ -11,31 +11,38 @@ add_executable(Veylorn
     game.h
     game.cpp
 
-    world/map.h
-    world/map.cpp
     world/lvlparser.h
     world/lvlparser.cpp
+    world/map.h
+    world/map.cpp
 
-    objects/object.h
-    objects/player.h
-    objects/player.cpp
-    objects/chest.h
-    objects/chest.cpp
-    objects/item.h
-
+    # objects/chest.h
+    # objects/chest.cpp
     objects/inventory.h
     objects/inventory.cpp
+    objects/item.h
+    objects/object.h
+    objects/object.cpp
+    objects/player.h
+    objects/player.cpp
 
+    ui/helptips.h
+    ui/helptips.cpp
+    ui/hud.h
+    ui/hud.cpp
     ui/render.h
     ui/render.cpp
+    ui/renderinventory.h
+    ui/renderinventory.cpp
 
-    maps/map1.txt
-    maps/map2.txt
-    maps/map3.txt
-    utils/conversion.h utils/conversion.cpp
-    ui/hud.h ui/hud.cpp
-    ui/renderinventory.h ui/renderinventory.cpp
-    objects/object.cpp
+    utils/conversion.h
+    utils/conversion.cpp
+
+    auxiliary/maps/map1.txt
+    auxiliary/maps/map2.txt
+    auxiliary/maps/map3.txt
+    auxiliary/help.txt
+
 
 )
 
