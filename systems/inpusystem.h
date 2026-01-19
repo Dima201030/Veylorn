@@ -1,5 +1,17 @@
 #pragma once
 
-struct InputSystem {
-    static char getKey();
+enum class Key {
+    None,
+    Esc,
+    Up,
+    Down,
+    Left,
+    Right,
+    HELP,
+    INVENTORY,
+    Enter,
+    Char
 };
+
+Key getKey(char& outChar);
+char getch();

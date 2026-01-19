@@ -2,9 +2,11 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 
 #include "map.h"
 #include "lvlparser.h"
+#include "../objects/npc.h"
 #include "../objects/object.h"
 #include "../objects/player.h"
 
@@ -68,6 +70,7 @@ Map::Map(std::string path, Player *player) : _matrix(nullptr), _column(0), _line
         parsePlayerFromServiceLine(_serviceLine, _player);
         parseObjects(path);
         setPlayer();
+        spawnNPCs();
     }
 }
 
@@ -76,7 +79,6 @@ Map::~Map() {
         delete[] _matrix[i];
     }
     delete[] _matrix;
-    delete   _player;
 }
 
 void Map::parseObjects(std::string path)
@@ -163,6 +165,9 @@ ErrorsCodeMap Map::loadMapFile(std::string path) {
             case 'g':
                 _matrix[x][y] = CellType::GOLD;
                 break;
+            case '+':
+                _matrix[x][y] = CellType::DOOR;
+                break;
             default:
                 _matrix[x][y] = CellType::EMPTY;
                 break;
@@ -198,6 +203,37 @@ void Map::reCreateMatrix() {
     }
 }
 
+void Map::spawnNPCs() {
+
+    if (!_player) return;
+
+    int npcCount = 3 + arc4random_uniform(3);
+
+    for (int i = 0; i < npcCount; ++i) {
+
+        size_t x, y;
+        int attempts = 0;
+
+        do {
+            x = 1 + arc4random_uniform(_lines - 2);
+            y = 1 + arc4random_uniform(_column - 2);
+            attempts++;
+        }
+        while ((_matrix[x][y] != CellType::EMPTY || (x == _player->_posX && y == _player->_posY)) && attempts < 50);
+
+        if (attempts >= 50) continue;
+
+        NPC npc;
+        npc.x = x;
+        npc.y = y;
+        npc.health = 20;
+        npc.damage = 5;
+
+        _npcs.push_back(npc);
+        _matrix[x][y] = CellType::NPC;
+    }
+}
+
 void Map::reCreateMatrix(CellType defaultValue) {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
@@ -211,6 +247,17 @@ void Map::reCreateMatrix(CellType defaultValue) {
         _matrix[y] = new CellType[_column];
         for (size_t x = 0; x < _column; ++x) {
             _matrix[y][x] = defaultValue;
+        }
+    }
+}
+
+void Map::removeNPC(size_t x, size_t y) {
+    _matrix[x][y] = CellType::EMPTY;
+
+    for (auto it = _npcs.begin(); it != _npcs.end(); ++it) {
+        if (it->x == x && it->y == y) {
+            _npcs.erase(it);
+            return;
         }
     }
 }
@@ -248,3 +295,6 @@ CellType Map::getCell(size_t x, size_t y) const {
     return _matrix[x][y];
 }
 
+bool Map::isFreeCell(size_t x, size_t y) const {
+    return _matrix[x][y] == CellType::EMPTY;
+}

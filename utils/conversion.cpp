@@ -34,17 +34,5 @@ size_t toST(int value) {
     return static_cast<size_t>(value);
 }
 
-char getch() {
-    termios oldt, newt;
-    tcgetattr(STDIN_FILENO, &oldt);
 
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
 
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    char ch = static_cast<char>(getchar());
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    return ch;
-}

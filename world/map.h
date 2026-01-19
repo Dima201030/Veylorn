@@ -7,11 +7,13 @@
 #include <string>
 #include <vector>
 
+// #include "../objects/npc.h"
 // #include "../objects/player.h"
 
 // Forward declaration
 struct Object;
 struct Player;
+struct NPC;
 
 enum class ErrorsCodeMap : int {
     OK = 0,
@@ -26,7 +28,9 @@ enum class CellType {
     PLAYER,
     TRACE,
     CHEST,
-    GOLD
+    GOLD,
+    NPC,
+    DOOR
 };
 
 struct Map {
@@ -65,6 +69,10 @@ struct Map {
 
     std::vector<Object> _objects;
 
+    std::vector<NPC> _npcs;
+    void removeNPC(size_t x, size_t y);
+    void spawnNPCs();
+
 private:
 
     CellType       **_matrix  = nullptr;
@@ -78,5 +86,7 @@ private:
     void reCreateMatrix();
 
     void reCreateMatrix(CellType defaultValue);
+
+    bool isFreeCell(size_t x, size_t y) const;
 
 };

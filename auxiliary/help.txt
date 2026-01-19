@@ -1,0 +1,10 @@
+w - move up
+a - move left
+s - move down
+d - move right
+
+Shift + w/a/s/d - run (2x speed)
+
+i - inventory
+h - help
+q - quit
