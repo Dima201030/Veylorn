@@ -19,6 +19,10 @@ char Render::cellToChar(CellType cell) {
         return 'c';
     case CellType::GOLD:
         return 'g';
+    case CellType::NPC:
+        return 'E';
+    case CellType::DOOR:
+        return '+';
     default:
         return '?';
     }
@@ -47,9 +51,16 @@ void Render::applyColor(CellType cell) {
     case CellType::GOLD:
         std::cout << "\033[32m";  // Желтый
         break;
+    case CellType::NPC:
+        std::cout << "\033[91m"; // Красный
+        break;
+    case CellType::DOOR:
+        std::cout << "\033[37m"; // Красный
+        break;
     default:
         std::cout << "\033[0m";   // Сброс
     }
+
 }
 
 void Render::resetColor() {

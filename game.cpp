@@ -1,10 +1,10 @@
 #include "game.h"
 
-
+#include "objects/inventory.h"
+#include "objects/item.h"
+#include "objects/npc.h"
 #include "objects/player.h"
 #include "world/map.h"
-#include "objects/inventory.h"
-#include <objects/item.h>
 #include "utils/conversion.h"
 
 Game::Game(std::string path, bool isRunning) : _isRunning(isRunning){
@@ -43,13 +43,25 @@ void Game::movePlayer(int dx, int dy, bool isRun) {
 
     if (isRun) {
         if (dx != 0) {
-            if (_currentMap->getCell(x - 1, y) == CellType::GOLD) {
-                _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+            if (dx > 0){
+                if (_currentMap->getCell(x - 1, y) == CellType::GOLD) {
+                    _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+                }
+            } else {
+                if (_currentMap->getCell(x + 1, y) == CellType::GOLD) {
+                    _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+                }
             }
 
         } else {
-            if (_currentMap->getCell(x, y - 1) == CellType::GOLD) {
-                _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+            if (dy > 0) {
+                if (_currentMap->getCell(x, y - 1) == CellType::GOLD) {
+                    _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+                }
+            } else {
+                if (_currentMap->getCell(x, y + 1) == CellType::GOLD) {
+                    _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
+                }
             }
         }
     }
@@ -58,7 +70,152 @@ void Game::movePlayer(int dx, int dy, bool isRun) {
         _inventory->_items.emplace_back(Item(ItemType::GOLD, 100), x, y);
     }
 
+    if (isRun) {
+        if (dx != 0) {
+            if (dx > 0){
+                if (_currentMap->getCell(x - 1, y) == CellType::NPC) {
+
+                    _isInCombat = true;
+                    _combatTargetX = x;
+                    _combatTargetY = y;
+                    return;
+                } else {
+                    _isInCombat = false;
+                    _combatTargetX = -1;
+                    _combatTargetY = -1;
+                }
+            } else {
+                if (_currentMap->getCell(x + 1, y) == CellType::NPC) {
+
+                    _isInCombat = true;
+                    _combatTargetX = x;
+                    _combatTargetY = y;
+                    return;
+                } else {
+                    _isInCombat = false;
+                    _combatTargetX = -1;
+                    _combatTargetY = -1;
+                }
+            }
+
+        } else {
+            if (dy > 0) {
+                if (_currentMap->getCell(x, y - 1) == CellType::NPC) {
+
+                    _isInCombat = true;
+                    _combatTargetX = x;
+                    _combatTargetY = y;
+                    return;
+                } else {
+                    _isInCombat = false;
+                    _combatTargetX = -1;
+                    _combatTargetY = -1;
+                }
+            } else {
+                if (_currentMap->getCell(x, y + 1) == CellType::NPC) {
+
+                    _isInCombat = true;
+                    _combatTargetX = x;
+                    _combatTargetY = y;
+                    return;
+                } else {
+                    _isInCombat = false;
+                    _combatTargetX = -1;
+                    _combatTargetY = -1;
+                }
+            }
+        }
+    }
+    if (_currentMap->getCell(x, y) == CellType::NPC) {
+
+        _isInCombat = true;
+        _combatTargetX = x;
+        _combatTargetY = y;
+        return;
+    } else {
+        _isInCombat = false;
+        _combatTargetX = -1;
+        _combatTargetY = -1;
+    }
+
+    if (isRun) {
+        if (dx != 0) {
+            if (dx > 0){
+                if (_currentMap->getCell(x - 1, y) == CellType::DOOR) {
+
+                    if (_inventory->_items.size() > 0) {
+                        _inventory->_items.pop_back();
+                    } else {
+                        return;
+                    }
+
+                }
+            } else {
+                if (_currentMap->getCell(x + 1, y) == CellType::DOOR) {
+                    if (_inventory->_items.size() > 0) {
+                        _inventory->_items.pop_back();
+                    } else {
+                        return;
+                    }
+                }
+            }
+
+        } else {
+            if (dy > 0) {
+                if (_currentMap->getCell(x, y - 1) == CellType::DOOR) {
+                    if (_inventory->_items.size() > 0) {
+                        _inventory->_items.pop_back();
+                    } else {
+                        return;
+                    }
+                }
+            } else {
+                if (_currentMap->getCell(x, y + 1) == CellType::DOOR) {
+                    if (_inventory->_items.size() > 0) {
+                        _inventory->_items.pop_back();
+                    } else {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    if (_currentMap->getCell(x, y) == CellType::DOOR) {
+        if (_inventory->_items.size() > 0) {
+            _inventory->_items.pop_back();
+        } else {
+            return;
+        }
+    }
+
     if(_currentMap){
         _currentMap->_player->move(*(_currentMap), dx, dy, isRun);
     }
 }
+
+void Game::attack() {
+    if (!_isInCombat) return;
+
+    for (auto it = _currentMap->_npcs.begin(); it != _currentMap->_npcs.end(); ++it) {
+        if (it->x == _combatTargetX && it->y == _combatTargetY) {
+
+            it->health -= 10;
+            _player->_health -= it->damage;
+
+            if (it->health <= 0) {
+                _currentMap->removeNPC(it->x, it->y);
+                _isInCombat = false;
+            }
+
+            if (_player->_health <= 0) {
+                _isRunning = false;
+            }
+
+            return;
+        }
+    }
+
+    _isInCombat = false;
+}
+
+

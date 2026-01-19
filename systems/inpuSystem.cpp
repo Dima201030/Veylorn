@@ -13,7 +13,7 @@ Key getKey(char& outChar) {
 
     char c = getchar();
 
-    if (c == '\x1b') { // ESC
+    if (c == '\x1b') {
         char seq1 = getchar();
         char seq2 = getchar();
 

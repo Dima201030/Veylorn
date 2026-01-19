@@ -21,6 +21,11 @@ struct Game {
     bool _isRunning     = true;
     bool _isInInventory = false;
     bool _isInTips = false;
+    bool _isInCombat = false;
+
+    int _combatTargetX = -1;
+    int _combatTargetY = -1;
+
 
     // void initNewGame();
     // void loadGame();
@@ -28,4 +33,5 @@ struct Game {
     // void changeMap();
 
     void movePlayer(int dx, int dy, bool isRun = false);
+    void attack();
 };

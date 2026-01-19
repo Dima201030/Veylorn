@@ -2,6 +2,7 @@
 
 enum class Key {
     None,
+    Esc,
     Up,
     Down,
     Left,

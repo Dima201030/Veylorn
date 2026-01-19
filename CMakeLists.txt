@@ -5,6 +5,10 @@ project(Veylorn LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(Python3_ROOT_DIR "/Library/Frameworks/Python.framework/Versions/3.12")
+
+find_package(Python3 REQUIRED COMPONENTS Development)
+
 add_executable(Veylorn
     main.cpp
 
@@ -28,6 +32,8 @@ add_executable(Veylorn
 
     systems/approve.h
     systems/approve.cpp
+    systems/genmaps.h
+    systems/genmaps.cpp
     systems/inpusystem.h
     systems/inpuSystem.cpp
 
@@ -50,9 +56,16 @@ add_executable(Veylorn
     auxiliary/maps/map3.txt
     auxiliary/help.txt
 
+    python/generatorMaps.py
+    settings/settings.h settings/settings.cpp
+    objects/npc.h objects/npc.cpp
 )
+
 
 target_include_directories(Veylorn
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${Python3_INCLUDE_DIRS}
 )
+
+target_link_libraries(Veylorn PRIVATE ${Python3_LIBRARIES})
