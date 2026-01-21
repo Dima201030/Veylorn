@@ -234,6 +234,11 @@ void Map::spawnNPCs() {
     }
 }
 
+bool Map::isEmptyMobs()
+{
+    return (_npcs.size() == 0) ? true : false;
+}
+
 void Map::reCreateMatrix(CellType defaultValue) {
     if (_matrix) {
         for (size_t i = 0; i < _lines; ++i) {
