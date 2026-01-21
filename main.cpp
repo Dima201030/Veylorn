@@ -25,6 +25,8 @@
 
 #include "world/map.h"
 
+#define MAX_ATTEMPTS 50
+
 void generateMap() {
     Py_Initialize();
 
@@ -66,7 +68,8 @@ void generateMap() {
 
 int main() {
 
-    int MAX_ATTEMPTS = 50;
+    int countLevels = 0;
+
     int attempts = 0;
 
     Game* game = nullptr;
@@ -100,6 +103,38 @@ int main() {
         if (game->_currentMap->_player->_health <= 0) {
             game->_isRunning = false;
             break;
+        }
+
+        if (countLevels == 1) {
+            game->_isRunning = false;
+            continue;
+        }
+        if (game->_currentMap->isEmptyMobs()) {
+            std::cout << "Все мобы уничтожены! Генерируем новый уровень...\n";
+
+            delete game;
+
+            int attempts = 0;
+            while (attempts < MAX_ATTEMPTS) {
+                generateMap();
+                game = new Game(mapPath, true);
+
+                if (game->_currentMap && game->_currentMap->isLoaded()) {
+                    break;
+                }
+
+                delete game;
+                game = nullptr;
+                attempts++;
+            }
+
+            if (!game || !game->_currentMap || !game->_currentMap->isLoaded()) {
+                std::cerr << "FATAL: failed to generate valid map\n";
+                std::abort();
+            }
+
+            countLevels++;
+            continue;
         }
 
         if (game->_isInInventory) {
@@ -226,14 +261,14 @@ int main() {
         default:
             break;
         }
-
-
     }
 
     Render::clearScreen();
     Render::setCursorPosition(0,0);
 
     std::cout << "\033[?25h"; // Show cursor
+
+    std::cout << "Thanks for your time" << std::endl;
 
     return 0;
 }
