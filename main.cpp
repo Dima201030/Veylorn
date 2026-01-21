@@ -105,7 +105,7 @@ int main() {
             break;
         }
 
-        if (countLevels == 1) {
+        if (countLevels == 7) {
             game->_isRunning = false;
             continue;
         }
